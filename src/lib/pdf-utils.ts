@@ -252,34 +252,20 @@ export async function generateComparisonReport(
   return await pdfDoc.save()
 }
 
-export async function countPDFCharacters(file: File): Promise<{
-  totalCharacters: number
-  estimatedCost: number
-  pageCount: number
-}> {
+export async function countPDFCharacters(file: File): Promise<number> {
   try {
-    const pdf = await getDocument(await file.arrayBuffer()).promise
-    const pageCount = pdf.numPages
+    const pdfData = await file.arrayBuffer()
+    const pdf = await getDocument(pdfData).promise
     let totalCharacters = 0
 
-    // Count characters in each page
-    for (let i = 1; i <= pageCount; i++) {
-      const currentPage = await pdf.getPage(i)
-      const textContent = await currentPage.getTextContent()
-      const pageText = textContent.items
-        .map((item: any) => item.str)
-        .join(' ')
+    for (let i = 1; i <= pdf.numPages; i++) {
+      const page = await pdf.getPage(i)
+      const textContent = await page.getTextContent()
+      const pageText = textContent.items.map((item: any) => item.str).join('')
       totalCharacters += pageText.length
     }
 
-    // Calculate estimated cost (DeepL charges per character)
-    const estimatedCost = (totalCharacters / 1000) * 0.02 // $0.02 per 1000 characters
-
-    return {
-      totalCharacters,
-      estimatedCost,
-      pageCount,
-    }
+    return totalCharacters
   } catch (error) {
     console.error('Error counting PDF characters:', error)
     throw new Error('Failed to analyze PDF file')
