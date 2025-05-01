@@ -8,7 +8,7 @@ if (typeof window !== 'undefined') {
   GlobalWorkerOptions.workerSrc = '/pdf.worker.js'
 } else {
   // Server-side - disable worker
-  GlobalWorkerOptions.workerSrc = null
+  GlobalWorkerOptions.workerSrc = '' // Empty string instead of null
 }
 
 export interface PDFDifference {
