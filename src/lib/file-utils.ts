@@ -77,8 +77,8 @@ export async function countCharacters(file: File): Promise<number> {
   try {
     if (file.type === 'application/pdf') {
       const { countPDFCharacters } = await import('./pdf-utils')
-      const result = await countPDFCharacters(file)
-      return result.totalCharacters
+      const totalCharacters = await countPDFCharacters(file)
+      return totalCharacters
     } else if (file.type === 'text/plain') {
       const text = await file.text()
       return text.length
