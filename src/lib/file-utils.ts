@@ -1,5 +1,6 @@
 import { z } from 'zod'
 import mammoth from 'mammoth'
+// @ts-ignore
 import pptxParser from 'pptx-parser'
 import * as XLSX from 'xlsx'
 
