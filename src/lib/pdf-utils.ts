@@ -1,14 +1,22 @@
 import { PDFDocument } from 'pdf-lib'
-import { getDocument, GlobalWorkerOptions } from 'pdfjs-dist'
 import { StandardFonts } from 'pdf-lib'
+import type { PDFDocumentProxy } from 'pdfjs-dist'
 
-// Configure PDF.js worker based on environment
-if (typeof window !== 'undefined') {
-  // Client-side - use the local worker
-  GlobalWorkerOptions.workerSrc = '/pdf.worker.js'
-} else {
-  // Server-side - disable worker
-  GlobalWorkerOptions.workerSrc = '' // Empty string instead of null
+// Types for PDF.js
+interface TextItem {
+  str: string
+  transform: number[]
+  width?: number
+  height?: number
+}
+
+interface TextContent {
+  items: TextItem[]
+}
+
+interface PDFPageProxy {
+  getTextContent(): Promise<TextContent>
+  view: number[]
 }
 
 export interface PDFDifference {
@@ -23,6 +31,21 @@ export interface PDFDifference {
   }
 }
 
+// Initialize PDF.js lazily
+async function initPDFJS() {
+  if (typeof window === 'undefined') {
+    // Server-side
+    const { getDocument, GlobalWorkerOptions, version } = await import('pdfjs-dist')
+    GlobalWorkerOptions.workerSrc = `//cdn.jsdelivr.net/npm/pdfjs-dist@${version}/build/pdf.worker.min.js`
+    return { getDocument }
+  } else {
+    // Client-side
+    const { getDocument, GlobalWorkerOptions, version } = await import('pdfjs-dist')
+    GlobalWorkerOptions.workerSrc = `/pdf.worker.min.js?v=${version}`
+    return { getDocument }
+  }
+}
+
 export async function comparePDFs(
   originalFile: File,
   modifiedFile: File,
@@ -31,6 +54,8 @@ export async function comparePDFs(
   const differences: PDFDifference[] = []
 
   try {
+    const { getDocument } = await initPDFJS()
+    
     // Load both PDFs
     const originalPdf = await getDocument(await originalFile.arrayBuffer()).promise
     const modifiedPdf = await getDocument(await modifiedFile.arrayBuffer()).promise
@@ -254,6 +279,7 @@ export async function generateComparisonReport(
 
 export async function countPDFCharacters(file: File): Promise<number> {
   try {
+    const { getDocument } = await initPDFJS()
     const pdfData = await file.arrayBuffer()
     const pdf = await getDocument(pdfData).promise
     let totalCharacters = 0

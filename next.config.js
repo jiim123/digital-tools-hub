@@ -5,7 +5,16 @@ const nextConfig = {
       ...config.resolve.fallback,
       fs: false,
       path: false,
+      canvas: false,
     }
+    // Add rule for worker files
+    config.module.rules.push({
+      test: /pdf\.worker\.(min\.)?js/,
+      type: 'asset/resource',
+      generator: {
+        filename: 'static/worker/[hash][ext][query]',
+      },
+    })
     return config
   },
 }

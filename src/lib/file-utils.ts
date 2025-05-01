@@ -70,10 +70,6 @@ async function extractExcelText(file: File): Promise<string> {
 }
 
 export async function countCharacters(file: File): Promise<number> {
-  if (typeof window === 'undefined') {
-    return 0
-  }
-
   try {
     if (file.type === 'application/pdf') {
       const { countPDFCharacters } = await import('./pdf-utils')
