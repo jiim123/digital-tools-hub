@@ -1,25 +1,18 @@
-import type { Metadata } from "next";
-import { Inter, Playfair_Display } from "next/font/google";
-import "./globals.css";
-import Navigation from "@/components/Navigation";
+import { Inter_Tight } from 'next/font/google'
 import { Toaster } from 'sonner'
+import Navigation from '@/components/Navigation'
+import './globals.css'
 
-const inter = Inter({
+const interTight = Inter_Tight({ 
   subsets: ['latin'],
+  variable: '--font-inter-tight',
   display: 'swap',
-  variable: '--font-inter',
 })
 
-const playfair = Playfair_Display({
-  subsets: ['latin'],
-  display: 'swap',
-  variable: '--font-playfair',
-})
-
-export const metadata: Metadata = {
-  title: "Digital Tools Hub",
-  description: "A collection of document processing tools",
-};
+export const metadata = {
+  title: 'Digital Tools Hub',
+  description: 'A collection of digital tools for document processing',
+}
 
 export default function RootLayout({
   children,
@@ -27,14 +20,20 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en" className={`${inter.variable} ${playfair.variable} bg-[#131618]`}>
-      <body className={inter.className}>
+    <html lang="en" className={`${interTight.variable}`}>
+      <head>
+        <link
+          rel="stylesheet"
+          href="https://fonts.googleapis.com/css2?family=Hubot+Sans:wght@400;500;600;700&display=swap"
+        />
+      </head>
+      <body>
         <Navigation />
-        <main className="md:pl-64 transition-all duration-300 nav-collapsed:md:pl-16">
+        <div className="main-container">
           {children}
-        </main>
-        <Toaster />
+        </div>
+        <Toaster position="top-center" />
       </body>
     </html>
-  );
+  )
 }

@@ -2,10 +2,11 @@
 
 import { useState, useEffect } from 'react'
 import { useDropzone } from 'react-dropzone'
-import { FiUpload, FiFile, FiX, FiCheckSquare, FiGlobe, FiFileText, FiClock, FiLoader, FiInfo } from 'react-icons/fi'
+import { FiUpload, FiFile, FiX, FiCheckSquare, FiFileText, FiClock, FiLoader, FiInfo } from 'react-icons/fi'
+import { Languages } from 'lucide-react'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { toast } from 'sonner'
-import { supportedLanguages } from '@/lib/languages'
+import { supportedLanguages, sourceLanguages } from '@/lib/languages'
 import { Progress } from '@/components/ui/progress'
 import {
   Tooltip,
@@ -25,6 +26,7 @@ interface Statistics {
 
 export default function TranslationPage() {
   const [file, setFile] = useState<File | null>(null)
+  const [sourceLanguage, setSourceLanguage] = useState('auto')
   const [targetLanguage, setTargetLanguage] = useState('de')
   const [isTranslating, setIsTranslating] = useState(false)
   const [progress, setProgress] = useState(0)
@@ -98,6 +100,7 @@ export default function TranslationPage() {
     try {
       const formData = new FormData()
       formData.append('file', file)
+      formData.append('sourceLanguage', sourceLanguage)
       formData.append('targetLanguage', targetLanguage)
 
       const response = await fetch('/api/translate', {
@@ -145,12 +148,13 @@ export default function TranslationPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#131618]">
+    <div className="min-h-screen bg-[#3e475c] bg-gradient-to-tr from-[#3e475c] via-[#1a1e21] to-[#1a1e21] bg-[length:200%_200%] bg-[position:0%_0%]">
       {/* Header Section with 4 columns */}
       <div className="w-full border-b border-[#3f4d57] bg-[#242a2f]">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 divide-y sm:divide-y-0 sm:divide-x divide-[#3f4d57]">
+        <div className="hidden sm:grid sm:grid-cols-2 lg:grid-cols-4 sm:divide-x divide-[#3f4d57]">
           {/* Title Column */}
-          <div className="p-4 sm:p-6 flex items-center">
+          <div className="p-4 sm:p-6 flex items-center gap-3">
+            <Languages className="w-6 h-6 text-[#cad9e6] shrink-0" />
             <div>
               <h1 className="text-xl sm:text-2xl font-bold text-[#cad9e6] font-heading">
                 Document Translation
@@ -166,10 +170,10 @@ export default function TranslationPage() {
             <div className="flex items-start gap-4">
               <FiFileText className="w-5 sm:w-6 h-5 sm:h-6 text-blue-600 shrink-0" />
               <div>
-                <p className="text-2xl sm:text-4xl font-bold text-[#cad9e6] font-heading tracking-tight">
+                <p className="text-sm text-[#cad9e6] font-sans">Documents Translated</p>
+                <p className="text-2xl sm:text-4xl font-bold text-[#cad9e6] font-heading tracking-tight mt-1">
                   {stats.documentsTranslated}
                 </p>
-                <p className="text-sm text-[#cad9e6] font-sans">Documents Translated</p>
               </div>
             </div>
           </div>
@@ -177,12 +181,12 @@ export default function TranslationPage() {
           {/* Most Used Language Column */}
           <div className="p-4 sm:p-6">
             <div className="flex items-start gap-4">
-              <FiGlobe className="w-5 sm:w-6 h-5 sm:h-6 text-emerald-600 shrink-0" />
+              <Languages className="w-5 sm:w-6 h-5 sm:h-6 text-emerald-600 shrink-0" />
               <div>
-                <p className="text-2xl sm:text-4xl font-bold text-[#cad9e6] font-heading tracking-tight truncate">
+                <p className="text-sm text-[#cad9e6] font-sans">Most Translated To</p>
+                <p className="text-2xl sm:text-4xl font-bold text-[#cad9e6] font-heading tracking-tight truncate mt-1">
                   {supportedLanguages.find(lang => lang.code === stats.mostUsedLanguage.code)?.name || 'None'}
                 </p>
-                <p className="text-sm text-[#cad9e6] font-sans">Most Translated To</p>
               </div>
             </div>
           </div>
@@ -192,7 +196,8 @@ export default function TranslationPage() {
             <div className="flex items-start gap-4">
               <FiClock className="w-5 sm:w-6 h-5 sm:h-6 text-purple-200 shrink-0" />
               <div>
-                <p className="text-2xl sm:text-4xl font-bold text-[#cad9e6] font-heading tracking-tight">
+                <p className="text-sm text-[#cad9e6] font-sans">Last Translation</p>
+                <p className="text-2xl sm:text-4xl font-bold text-[#cad9e6] font-heading tracking-tight mt-1">
                   {stats.lastTranslationDate ? 
                     new Date(stats.lastTranslationDate).toLocaleDateString(undefined, {
                       month: 'short',
@@ -201,7 +206,6 @@ export default function TranslationPage() {
                     '—'
                   }
                 </p>
-                <p className="text-sm text-[#cad9e6] font-sans">Last Translation</p>
               </div>
             </div>
           </div>
@@ -209,66 +213,11 @@ export default function TranslationPage() {
       </div>
 
       <div className="max-w-7xl mx-auto px-4 py-6 sm:py-8 space-y-6 sm:space-y-8">
-        {/* Translation Settings */}
-        <div className="bg-[#242a2f] border border-[#3f4d57] rounded-xl overflow-hidden">
-          <div className="px-4 sm:px-6 py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-            <div className="flex items-center gap-3">
-              <FiGlobe className="w-5 h-5 text-blue-600 shrink-0" />
-              <h2 className="text-lg font-semibold text-[#e3ebf2] font-heading">
-                Translate document to:
-              </h2>
-              <TooltipProvider>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <button className="text-[#6d879b] hover:text-[#cad9e6] transition-colors focus:outline-none">
-                      <FiInfo className="w-4 h-4" />
-                    </button>
-                  </TooltipTrigger>
-                  <TooltipContent 
-                    className="max-w-[300px] bg-[#353f48] border border-[#596e7e] text-[#e3ebf2] shadow-xl"
-                    side="right"
-                    sideOffset={10}
-                  >
-                    <div className="space-y-2">
-                      <p className="font-medium text-[#cad9e6]">DeepL Translation</p>
-                      <p className="text-sm text-[#a3bed3]">
-                        Powered by DeepL's neural networks, this tool:
-                      </p>
-                      <ul className="text-sm text-[#a3bed3] list-disc list-inside space-y-1">
-                        <li>Maintains document formatting</li>
-                        <li>Preserves context and tone</li>
-                        <li>Supports multiple file formats</li>
-                        <li>Provides human-quality translations</li>
-                        <li>No documents are being stored on our servers</li>
-                      </ul>
-                    </div>
-                  </TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
-            </div>
-            <Select value={targetLanguage} onValueChange={setTargetLanguage}>
-              <SelectTrigger className="w-full sm:w-[200px] bg-[#353f48] border-[#596e7e] text-[#e3ebf2]">
-                <SelectValue placeholder="Select language" />
-              </SelectTrigger>
-              <SelectContent className="bg-[#242a2f] border border-[#596e7e] shadow-lg">
-                {supportedLanguages.map((lang) => (
-                  <SelectItem key={lang.code} value={lang.code} className="text-[#e3ebf2] hover:bg-[#353f48] focus:bg-[#353f48] hover:text-[#e3ebf2] focus:text-[#e3ebf2] cursor-pointer">
-                    <div className="flex items-center gap-2">
-                      <FiGlobe className="w-4 h-4" />
-                      {lang.name}
-                    </div>
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-        </div>
-
         {/* Upload Section */}
         <div className="space-y-4 sm:space-y-6">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
-              <h2 className="text-xl sm:text-2xl font-semibold text-[#e3ebf2] font-heading">Start Translation</h2>
+              <h2 className="text-xl sm:text-4xl font-semibold text-[#e3ebf2] font-heading tracking-tight">Start Translation</h2>
               <p className="text-sm text-[#cad9e6] mt-1 font-sans">Upload your document below to begin</p>
             </div>
             {file && (
@@ -313,39 +262,122 @@ export default function TranslationPage() {
               )}
             </div>
           </div>
-
-          {file && (
-            <div className="flex items-center justify-end">
-              <button
-                onClick={translateDocument}
-                disabled={isTranslating}
-                className="flex items-center justify-center gap-2 px-4 sm:px-6 py-2.5 sm:py-3 bg-[#353f48] text-[#e3ebf2] rounded-lg hover:bg-[#242a2f]/80 transition-all border border-[#596e7e] disabled:opacity-50 disabled:cursor-not-allowed w-full sm:w-auto"
-              >
-                {isTranslating ? (
-                  <>
-                    <FiLoader className="w-5 h-5 animate-spin" />
-                    <span>Translating...</span>
-                  </>
-                ) : (
-                  <>
-                    <FiGlobe className="w-5 h-5" />
-                    <span>Translate Document</span>
-                  </>
-                )}
-              </button>
-            </div>
-          )}
-
-          {isTranslating && (
-            <div className="bg-[#242a2f] border border-[#3f4d57] rounded-lg p-4">
-              <div className="flex justify-between text-sm text-[#cad9e6] mb-2">
-                <span>Translation Progress</span>
-                <span>{progress}%</span>
-              </div>
-              <Progress value={progress} className="h-2 bg-[#353f48]" />
-            </div>
-          )}
         </div>
+
+        {/* Translation Settings */}
+        <div className="bg-[#242a2f] border border-[#3f4d57] rounded-xl overflow-hidden">
+          <div className="px-4 sm:px-6 py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div className="flex flex-col sm:flex-row sm:items-center gap-6">
+              <div className="flex items-center gap-3">
+                <Languages className="w-5 h-5 text-blue-600 shrink-0" />
+                <h2 className="text-lg font-semibold text-[#e3ebf2] font-heading">
+                  Translation Settings
+                </h2>
+              </div>
+              <div className="flex flex-col sm:flex-row items-center gap-6">
+                <div className="flex items-center gap-3 min-w-[300px]">
+                  <span className="text-[#a3bed3] whitespace-nowrap">From:</span>
+                  <Select value={sourceLanguage} onValueChange={setSourceLanguage}>
+                    <SelectTrigger className="flex-1 bg-[#353f48] border-[#596e7e] text-[#e3ebf2]">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent className="max-h-[300px] bg-[#353f48] border-[#596e7e]">
+                      {sourceLanguages.map((lang) => (
+                        <SelectItem
+                          key={lang.code}
+                          value={lang.code}
+                          className="text-[#e3ebf2] hover:bg-[#242a2f] focus:bg-[#242a2f] focus:text-[#e3ebf2]"
+                        >
+                          {lang.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="flex items-center gap-3 min-w-[300px]">
+                  <span className="text-[#a3bed3] whitespace-nowrap">To:</span>
+                  <Select value={targetLanguage} onValueChange={setTargetLanguage}>
+                    <SelectTrigger className="flex-1 bg-[#353f48] border-[#596e7e] text-[#e3ebf2]">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent className="max-h-[300px] bg-[#353f48] border-[#596e7e]">
+                      {supportedLanguages.map((lang) => (
+                        <SelectItem
+                          key={lang.code}
+                          value={lang.code}
+                          className="text-[#e3ebf2] hover:bg-[#242a2f] focus:bg-[#242a2f] focus:text-[#e3ebf2]"
+                        >
+                          {lang.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+            </div>
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <button className="text-[#6d879b] hover:text-[#cad9e6] transition-colors focus:outline-none">
+                    <FiInfo className="w-4 h-4" />
+                  </button>
+                </TooltipTrigger>
+                <TooltipContent 
+                  className="max-w-[300px] bg-[#353f48] border border-[#596e7e] text-[#e3ebf2] shadow-xl"
+                  side="right"
+                  sideOffset={10}
+                >
+                  <div className="space-y-2">
+                    <p className="font-medium text-[#cad9e6]">DeepL Translation</p>
+                    <p className="text-sm text-[#a3bed3]">
+                      Powered by DeepL's neural networks, this tool:
+                    </p>
+                    <ul className="text-sm text-[#a3bed3] list-disc list-inside space-y-1">
+                      <li>Auto-detects source language for better accuracy</li>
+                      <li>Maintains document formatting</li>
+                      <li>Preserves context and tone</li>
+                      <li>Supports multiple file formats</li>
+                      <li>Provides human-quality translations</li>
+                      <li>Doesnt store documents on our servers</li>
+                    </ul>
+                  </div>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          </div>
+        </div>
+
+        {file && (
+          <div className="flex items-center justify-end">
+            <button
+              onClick={translateDocument}
+              disabled={isTranslating}
+              className="flex items-center justify-center gap-2 px-4 sm:px-6 py-2.5 sm:py-3 bg-[#353f48] text-[#e3ebf2] rounded-lg hover:bg-[#242a2f]/80 transition-all border border-[#596e7e] disabled:opacity-50 disabled:cursor-not-allowed w-full sm:w-auto"
+            >
+              {isTranslating ? (
+                <>
+                  <FiLoader className="w-5 h-5 animate-spin" />
+                  <span>Translating...</span>
+                </>
+              ) : (
+                <>
+                  <Languages className="w-5 h-5" />
+                  <span>Translate Document</span>
+                </>
+              )}
+            </button>
+          </div>
+        )}
+
+        {isTranslating && (
+          <div className="bg-[#242a2f] border border-[#3f4d57] rounded-lg p-4">
+            <div className="flex justify-between text-sm text-[#cad9e6] mb-2">
+              <span>Translation Progress</span>
+              <span>{progress}%</span>
+            </div>
+            <Progress value={progress} className="h-2 bg-[#353f48]" />
+          </div>
+        )}
       </div>
     </div>
   )

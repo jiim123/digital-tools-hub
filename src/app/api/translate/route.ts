@@ -18,6 +18,7 @@ export async function POST(request: NextRequest) {
     const formData = await request.formData()
     
     const file = formData.get('file') as File
+    const sourceLanguage = formData.get('sourceLanguage') as string || 'auto'
     const targetLanguage = formData.get('targetLanguage') as string
     const apiKey = process.env.DEEPL_API_KEY
 
@@ -25,6 +26,7 @@ export async function POST(request: NextRequest) {
       fileName: file?.name,
       fileType: file?.type,
       fileSize: file?.size,
+      sourceLanguage,
       targetLanguage,
       hasApiKey: !!apiKey
     })
@@ -53,7 +55,7 @@ export async function POST(request: NextRequest) {
     }
 
     console.log('Starting document translation...')
-    const result = await translateDocument(file, 'auto', targetLanguage, apiKey)
+    const result = await translateDocument(file, sourceLanguage, targetLanguage, apiKey)
 
     if (!result.success) {
       console.error('Translation failed:', result.error)

@@ -2,48 +2,38 @@ const https = require('https');
 const fs = require('fs');
 const path = require('path');
 
-const FONTS = [
+const fonts = [
   {
-    url: 'https://github.com/github/hubot-sans/raw/main/fonts/hubot-sans/webfonts/HubotSans-Regular.woff2',
-    filename: 'Hubot-Sans-Regular.woff2'
+    name: 'Helvetica.afm',
+    url: 'https://raw.githubusercontent.com/foliojs/pdfkit/master/lib/font/data/Helvetica.afm'
   },
   {
-    url: 'https://github.com/github/hubot-sans/raw/main/fonts/hubot-sans/webfonts/HubotSans-Medium.woff2',
-    filename: 'Hubot-Sans-Medium.woff2'
-  },
-  {
-    url: 'https://github.com/github/hubot-sans/raw/main/fonts/hubot-sans/webfonts/HubotSans-Bold.woff2',
-    filename: 'Hubot-Sans-Bold.woff2'
+    name: 'Helvetica-Bold.afm',
+    url: 'https://raw.githubusercontent.com/foliojs/pdfkit/master/lib/font/data/Helvetica-Bold.afm'
   }
 ];
 
-const downloadFont = (url, filename) => {
-  const targetPath = path.join(__dirname, '../src/fonts', filename);
-  
-  https.get(url, (response) => {
-    if (response.statusCode === 302) {
-      // Follow redirect
-      https.get(response.headers.location, (redirectResponse) => {
-        const fileStream = fs.createWriteStream(targetPath);
-        redirectResponse.pipe(fileStream);
-        
-        fileStream.on('finish', () => {
-          console.log(`Downloaded ${filename}`);
-          fileStream.close();
-        });
-      });
-    } else {
-      const fileStream = fs.createWriteStream(targetPath);
-      response.pipe(fileStream);
-      
-      fileStream.on('finish', () => {
-        console.log(`Downloaded ${filename}`);
-        fileStream.close();
-      });
-    }
-  }).on('error', (err) => {
-    console.error(`Error downloading ${filename}:`, err.message);
-  });
-};
+const fontsDir = path.join(process.cwd(), 'public', 'fonts');
 
-FONTS.forEach(font => downloadFont(font.url, font.filename)); 
+// Create fonts directory if it doesn't exist
+if (!fs.existsSync(fontsDir)) {
+  fs.mkdirSync(fontsDir, { recursive: true });
+}
+
+// Download each font file
+fonts.forEach(font => {
+  const filePath = path.join(fontsDir, font.name);
+  const file = fs.createWriteStream(filePath);
+  
+  https.get(font.url, response => {
+    response.pipe(file);
+    
+    file.on('finish', () => {
+      file.close();
+      console.log(`Downloaded ${font.name}`);
+    });
+  }).on('error', err => {
+    fs.unlink(filePath, () => {}); // Delete the file if download fails
+    console.error(`Error downloading ${font.name}:`, err.message);
+  });
+}); 

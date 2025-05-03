@@ -36,12 +36,14 @@ export const supportedLanguages: Language[] = [
 ]
 
 // Source languages that can be auto-detected
-export const autoDetectableLanguages = [
-  'bg', 'cs', 'da', 'de', 'el', 'en', 'es', 'et', 'fi', 'fr', 'hu', 'id', 'it', 'ja', 'ko', 'lt', 'lv', 'nb', 'nl', 'pl', 'pt', 'ro', 'ru', 'sk', 'sl', 'sv', 'tr', 'uk', 'zh'
+export const sourceLanguages: Language[] = [
+  { code: 'auto', name: 'Auto-detect' },
+  ...supportedLanguages
 ]
 
 // Get language name from code
 export function getLanguageName(code: string): string {
+  if (code === 'auto') return 'Auto-detect'
   const language = supportedLanguages.find(lang => lang.code === code.toLowerCase())
   return language ? language.name : code
 } 

@@ -3,7 +3,10 @@
 import { useState, useEffect } from 'react'
 import { useDropzone } from 'react-dropzone'
 import PDFComparison from '@/components/PDFComparison'
-import { FiUpload, FiFile, FiX, FiCheckSquare, FiClock, FiFileText, FiTrendingUp, FiChevronDown, FiChevronUp, FiMonitor } from 'react-icons/fi'
+import { FiUpload, FiFile, FiX, FiCheckSquare, FiClock, FiFileText, FiTrendingUp, FiChevronDown, FiChevronUp, FiMonitor, FiImage } from 'react-icons/fi'
+import { Languages, GitCompare } from 'lucide-react'
+import Link from 'next/link'
+import { usePathname } from 'next/navigation'
 
 interface Statistics {
   documentsCompared: number;
@@ -13,11 +16,29 @@ interface Statistics {
 
 const MANUAL_REVIEW_TIME_PER_PAGE = 5; // estimated minutes to review one page manually
 
+const tools = [
+  {
+    title: 'Document Translation',
+    href: '/tools/translation',
+    icon: Languages
+  },
+  {
+    title: 'PDF Comparison',
+    href: '/tools/comparison',
+    icon: GitCompare
+  },
+  {
+    title: 'Image Compression',
+    href: '/tools/compression',
+    icon: FiImage
+  }
+]
+
 function ResponsiveWarning() {
   return (
-    <div className="fixed inset-0 bottom-16 md:bottom-0 z-40 lg:hidden">
-      <div className="min-h-screen bg-[#131618]/95 backdrop-blur-sm p-4 flex items-center justify-center">
-        <div className="bg-[#242a2f] border border-[#3f4d57] rounded-xl p-6 max-w-md w-full shadow-xl">
+    <div className="fixed inset-x-0 top-0 bottom-16 z-30 lg:hidden pointer-events-none">
+      <div className="bg-[#131618]/95 backdrop-blur-sm p-4 flex items-center justify-center h-full">
+        <div className="bg-[#242a2f] border border-[#3f4d57] rounded-xl p-6 max-w-md w-full shadow-xl pointer-events-auto">
           <div className="flex flex-col items-center text-center gap-4">
             <div className="w-16 h-16 rounded-full bg-[#353f48] flex items-center justify-center">
               <FiMonitor className="w-8 h-8 text-[#e3ebf2]" />
@@ -51,6 +72,8 @@ export default function ComparisonPage() {
     timeSaved: 0,
     lastComparisonDate: null
   })
+
+  const pathname = usePathname()
 
   // Load statistics from localStorage on mount
   useEffect(() => {
@@ -121,15 +144,16 @@ export default function ComparisonPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#131618]">
+    <div className="min-h-screen bg-[#3e475c] bg-gradient-to-tr from-[#3e475c] via-[#1a1e21] to-[#1a1e21] bg-[length:200%_200%] bg-[position:0%_0%]">
       <ResponsiveWarning />
       {/* Header Section with 4 columns */}
       <div className="w-full border-b border-[#3f4d57] bg-[#242a2f]">
-        <div className="grid grid-cols-4 divide-x divide-[#3f4d57]">
+        <div className="hidden sm:grid sm:grid-cols-2 lg:grid-cols-4 sm:divide-x divide-[#3f4d57]">
           {/* Title Column */}
-          <div className="p-6 flex items-center">
+          <div className="p-4 sm:p-6 flex items-center gap-3">
+            <GitCompare className="w-6 h-6 text-[#cad9e6] shrink-0" />
             <div>
-              <h1 className="text-2xl font-bold text-[#cad9e6] font-heading">
+              <h1 className="text-xl sm:text-2xl font-bold text-[#cad9e6] font-heading">
                 PDF Comparison
               </h1>
               <p className="text-sm text-[#cad9e6] mt-1 font-sans">
@@ -139,37 +163,38 @@ export default function ComparisonPage() {
           </div>
 
           {/* Documents Compared Column */}
-          <div className="p-6">
+          <div className="p-4 sm:p-6">
             <div className="flex items-start gap-4">
-              <FiFileText className="w-6 h-6 text-blue-600" />
+              <FiFileText className="w-5 sm:w-6 h-5 sm:h-6 text-blue-600 shrink-0" />
               <div>
-                <p className="text-4xl font-bold text-[#cad9e6] font-heading tracking-tight">
+                <p className="text-sm text-[#cad9e6] font-sans">Documents Compared</p>
+                <p className="text-2xl sm:text-4xl font-bold text-[#cad9e6] font-heading tracking-tight mt-1">
                   {stats.documentsCompared}
                 </p>
-                <p className="text-sm text-[#cad9e6] font-sans">Documents Compared</p>
               </div>
             </div>
           </div>
 
           {/* Time Saved Column */}
-          <div className="p-6">
+          <div className="p-4 sm:p-6">
             <div className="flex items-start gap-4">
-              <FiClock className="w-6 h-6 text-emerald-600" />
+              <FiClock className="w-5 sm:w-6 h-5 sm:h-6 text-emerald-600 shrink-0" />
               <div>
-                <p className="text-4xl font-bold text-[#cad9e6] font-heading tracking-tight">
+                <p className="text-sm text-[#cad9e6] font-sans">Time Saved</p>
+                <p className="text-2xl sm:text-4xl font-bold text-[#cad9e6] font-heading tracking-tight mt-1">
                   {formatTimeSaved(stats.timeSaved)}
                 </p>
-                <p className="text-sm text-[#cad9e6] font-sans">Time Saved</p>
               </div>
             </div>
           </div>
 
           {/* Last Comparison Column */}
-          <div className="p-6">
+          <div className="p-4 sm:p-6">
             <div className="flex items-start gap-4">
-              <FiTrendingUp className="w-6 h-6 text-purple-200" />
+              <FiTrendingUp className="w-5 sm:w-6 h-5 sm:h-6 text-purple-200 shrink-0" />
               <div>
-                <p className="text-4xl font-bold text-[#cad9e6] font-heading tracking-tight">
+                <p className="text-sm text-[#cad9e6] font-sans">Last Comparison</p>
+                <p className="text-2xl sm:text-4xl font-bold text-[#cad9e6] font-heading tracking-tight mt-1">
                   {stats.lastComparisonDate ? 
                     new Date(stats.lastComparisonDate).toLocaleDateString(undefined, {
                       month: 'short',
@@ -178,7 +203,6 @@ export default function ComparisonPage() {
                     '—'
                   }
                 </p>
-                <p className="text-sm text-[#cad9e6] font-sans">Last Comparison</p>
               </div>
             </div>
           </div>
@@ -237,8 +261,8 @@ export default function ComparisonPage() {
 
               <div className="mt-4 p-4 rounded-lg bg-[#242a2f]">
                 <p className="text-sm text-[#cad9e6]">
-                  <strong className="text-[#e3ebf2]">Time-saving estimate:</strong> Our tool saves approximately {MANUAL_REVIEW_TIME_PER_PAGE} minutes per page compared to manual review. 
-                  Users have saved {formatTimeSaved(stats.timeSaved)} across {stats.documentsCompared} documents.
+                  <strong className="text-[#e3ebf2]">Time-saving estimate:</strong> The tool saves approximately {MANUAL_REVIEW_TIME_PER_PAGE} minutes per page compared to manual review. 
+                  Users have so far saved {formatTimeSaved(stats.timeSaved)} across {stats.documentsCompared} documents.
                 </p>
               </div>
             </div>
@@ -249,7 +273,7 @@ export default function ComparisonPage() {
         <div className="space-y-6">
           <div className="flex items-center justify-between">
             <div>
-              <h2 className="text-2xl font-semibold text-[#e3ebf2] font-heading">Start Comparison</h2>
+              <h2 className="text-xl sm:text-4xl font-semibold text-[#e3ebf2] font-heading tracking-tight">Start Comparison</h2>
               <p className="text-sm text-[#cad9e6] mt-1 font-sans">Upload your documents below to begin</p>
             </div>
             {(originalFile || modifiedFile) && (
@@ -267,7 +291,7 @@ export default function ComparisonPage() {
             <div className="grid grid-cols-2 gap-6">
               <div
                 {...getOriginalRootProps()}
-                className="bg-[#242a2f] border border-dashed border-[#596e7e] rounded-xl p-8 text-center cursor-pointer hover:bg-[#242a2f]/80 transition-all group"
+                className="bg-[#242a2f] border border-dashed border-[#596e7e] rounded-xl p-12 text-center cursor-pointer hover:bg-[#242a2f]/80 transition-all group"
               >
                 <input {...getOriginalInputProps()} />
                 <div className="flex flex-col items-center gap-4">
@@ -337,6 +361,26 @@ export default function ComparisonPage() {
               </div>
             </div>
           )}
+        </div>
+      </div>
+
+      {/* Mobile Navigation */}
+      <div className="lg:hidden fixed bottom-0 left-0 right-0 bg-[#242a2f] border-t border-[#3f4d57]">
+        <div className="flex justify-around">
+          {tools.map((tool) => (
+            <Link
+              key={tool.title}
+              href={tool.href}
+              className={`flex flex-col items-center p-3 transition-colors ${
+                pathname === tool.href
+                  ? 'text-[#ffffff] bg-[#353f48]'
+                  : 'text-[#ffffff] hover:bg-[#353f48]'
+              }`}
+            >
+              <tool.icon className="w-5 h-5" />
+              <span className="text-xs mt-1">{tool.title}</span>
+            </Link>
+          ))}
         </div>
       </div>
     </div>

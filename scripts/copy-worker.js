@@ -1,13 +1,13 @@
 const fs = require('fs');
 const path = require('path');
 
-// Try to find the minified worker first, then fall back to regular worker
+// Try to find the minified worker first, then fall back to regular worker (mjs extension for v4+)
 const possibleSourcePaths = [
-  path.join(__dirname, '..', 'node_modules', 'pdfjs-dist', 'build', 'pdf.worker.min.js'),
-  path.join(__dirname, '..', 'node_modules', 'pdfjs-dist', 'build', 'pdf.worker.js')
+  path.join(__dirname, '..', 'node_modules', 'pdfjs-dist', 'build', 'pdf.worker.min.mjs'),
+  path.join(__dirname, '..', 'node_modules', 'pdfjs-dist', 'build', 'pdf.worker.mjs')
 ];
 
-// Destination path in public directory
+// Destination path in public directory (keep .js for compatibility)
 const destPath = path.join(__dirname, '..', 'public', 'pdf.worker.min.js');
 
 // Create directories if they don't exist
@@ -22,7 +22,7 @@ for (const sourcePath of possibleSourcePaths) {
   if (fs.existsSync(sourcePath)) {
     try {
       fs.copyFileSync(sourcePath, destPath);
-      console.log(`PDF.js worker file copied successfully from ${sourcePath}!`);
+      console.log(`PDF.js worker file copied successfully from ${sourcePath} to ${destPath}!`);
       copied = true;
       break;
     } catch (error) {

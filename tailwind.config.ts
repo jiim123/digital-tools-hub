@@ -10,8 +10,7 @@ const config: Config = {
   theme: {
     extend: {
       fontFamily: {
-        sans: ['var(--font-inter)', 'system-ui', 'sans-serif'],
-        heading: ['var(--font-playfair)', 'Georgia', 'serif'],
+        sans: ['var(--font-inter-tight)', 'system-ui', 'sans-serif'],
       },
       colors: {
         border: 'oklch(var(--border))',

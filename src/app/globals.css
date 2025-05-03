@@ -2,6 +2,12 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer components {
+  .font-heading {
+    font-family: 'Hubot Sans', system-ui, sans-serif;
+  }
+}
+
 @layer base {
   :root {
     --radius: 0.75rem;
@@ -71,6 +77,19 @@
     --sidebar-border: 100% 0 0 / 0.1;
     --sidebar-ring: 48.8% 24.3% 264.376;
   }
+
+  html {
+    @apply bg-[#131618];
+  }
+  
+  body {
+    @apply text-[#e3ebf2];
+  }
+
+  /* Ensure proper font loading */
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-heading font-semibold;
+  }
 }
 
 @layer base {
@@ -79,5 +98,22 @@
   }
   body {
     @apply bg-background text-foreground;
+  }
+}
+
+/* Navigation and main content layout */
+.main-container {
+  @apply transition-all duration-300;
+  padding-left: 16rem; /* 256px = w-64 */
+}
+
+[data-nav-collapsed="true"] .main-container {
+  padding-left: 4rem; /* 64px = w-16 */
+}
+
+@media (max-width: 1024px) {
+  .main-container {
+    padding-left: 0;
+    padding-bottom: 4rem; /* Space for mobile nav */
   }
 }

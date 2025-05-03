@@ -33,6 +33,13 @@ export async function POST(request: NextRequest) {
       case 'webp':
         sharpInstance = sharpInstance.webp({ quality })
         break
+      case 'tiff':
+        sharpInstance = sharpInstance.tiff({
+          quality,
+          compression: 'jpeg',
+          predictor: 'horizontal'
+        })
+        break
       default:
         sharpInstance = sharpInstance.jpeg({ quality })
     }
