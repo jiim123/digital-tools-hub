@@ -9,9 +9,6 @@
     "lint": "next lint",
     "postinstall": "node scripts/copy-worker.js && node scripts/ensure-temp-dir.js"
   },
-  "engines": {
-    "node": ">=20.x"
-  },
   "dependencies": {
     "@radix-ui/react-dialog": "^1.0.5",
     "@radix-ui/react-dropdown-menu": "^2.0.6",
